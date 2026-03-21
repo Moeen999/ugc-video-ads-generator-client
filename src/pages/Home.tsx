@@ -5,13 +5,13 @@ import Faq from "../components/Faq";
 import CTA from "../components/CTA";
 
 export default function Home() {
-    return (
-        <>
-            <Hero />
-            <Features />
-            <Pricing />
-            <Faq />
-            <CTA />
-        </>
-    )
+  return (
+    <>
+      <Hero />
+      <Features />
+      <Pricing />
+      <Faq />
+      <CTA />
+    </>
+  );
 }

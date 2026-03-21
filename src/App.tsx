@@ -4,7 +4,13 @@ import SoftBackdrop from "./components/SoftBackdrop";
 import Footer from "./components/Footer";
 import LenisScroll from "./components/lenis";
 import { useEffect } from "react";
-import { useLocation } from "react-router-dom";
+import { Route, Routes, useLocation } from "react-router-dom";
+import Generator from "./pages/Generator";
+import Result from "./pages/Result";
+import MyGenerations from "./pages/MyGenerations";
+import Community from "./pages/Community";
+import Plans from "./pages/Plans";
+import Loading from "./pages/Loading";
 
 function App() {
   const { pathname } = useLocation();
@@ -17,7 +23,15 @@ function App() {
       <SoftBackdrop />
       <LenisScroll />
       <Navbar />
-      <Home />
+      <Routes>
+        <Route path="/" element={<Home />}></Route>
+        <Route path="/generate" element={<Generator />}></Route>
+        <Route path="/result/:projectId" element={<Result />}></Route>
+        <Route path="/my-generations" element={<MyGenerations />}></Route>
+        <Route path="/community" element={<Community />}></Route>
+        <Route path="/plans" element={<Plans />}></Route>
+        <Route path="/loading" element={<Loading />}></Route>
+      </Routes>
       <Footer />
     </>
   );
