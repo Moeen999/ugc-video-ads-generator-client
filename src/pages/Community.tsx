@@ -21,7 +21,7 @@ const Community = () => {
 
   return isLoading ? (
     <div className="flex items-center justify-center min-h-screen">
-      <Loader2Icon />
+      <Loader2Icon className="size-7 animate-spin text-indigo-400" />
     </div>
   ) : (
     <div className="min-h-screen text-white p-6 md:p-12 my-28">
