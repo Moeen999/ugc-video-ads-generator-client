@@ -8,19 +8,38 @@ import {
   SparkleIcon,
   VideoIcon,
 } from "lucide-react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate, useParams } from "react-router-dom";
 import { GhostButton, PrimaryButton } from "../components/Buttons";
+import { useAuth } from "@clerk/react";
+import api from "../config/axios";
+import toast from "react-hot-toast";
 
 const Result = () => {
+  const { projectId } = useParams();
+  const {getToken} = useAuth();
+  const {user, isLoaded} = useAuth();
+  const navigate = useNavigate();
+
   const [project, setProject] = useState<Project>({} as Project);
   const [isLoading, setIsloading] = useState(true);
   const [isGenerating, setIsgenerating] = useState(false);
 
-  const fetchProjectData = () => {
-    setTimeout(() => {
-      setProject(dummyGenerations[0]);
+  const fetchProjectData = async () => {
+    try {
+      const token = await getToken();
+      const {data} = await api.get(`/api/user/project/${projectId}`, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+
+      setIsgenerating(false);
+      setProject(data.project);
       setIsloading(false);
-    }, 3000);
+    } catch (error: any) {
+      toast.error(error?.response?.data?.message || error.message);
+      console.log(error);
+    }
   };
 
   const handleGenerateVideo = () => {

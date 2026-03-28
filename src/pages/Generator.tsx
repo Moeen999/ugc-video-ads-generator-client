@@ -8,8 +8,16 @@ import {
   Wand2Icon,
 } from "lucide-react";
 import { PrimaryButton } from "../components/Buttons";
+import { useAuth, useUser } from "@clerk/react";
+import { useNavigate } from "react-router-dom";
+import toast from "react-hot-toast";
+import api from "../config/axios";
 
 const Generator = () => {
+  const { user } = useUser();
+  const { getToken } = useAuth();
+  const navigate = useNavigate();
+
   const [name, setName] = useState("");
   const [productName, setProductName] = useState("");
   const [productDescription, setProductDescription] = useState("");
@@ -34,6 +42,38 @@ const Generator = () => {
 
   const handleGenerate = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
+    if (!user) return toast.error("Pleaser login yto generate.");
+    if (!productImage || !modelImage || !name || !productName || !aspectRatio) {
+      return toast.error("Please fill all th reuired fields");
+    }
+
+    try {
+      setIsGenerating(true);
+      const formData = new FormData();
+      formData.append("name", name);
+      formData.append("productName", productName);
+      formData.append("productDescription", productDescription);
+      formData.append("aspectRatio", aspectRatio);
+      formData.append("userPrompt", userPrompt);
+
+      const token = await getToken();
+      const { data } = await api.post("/api/project/generate", formData, {
+        headers: {
+          "Content-Type": "multipart/form-data",
+          Authorization: `Bearer ${token}`,
+        },
+      });
+
+      toast.success(data.message || "Generation started successfully!");
+      navigate(`/result/${data.projectId}`);
+    } catch (error: any) {
+      setIsGenerating(false);
+      toast.error(
+        error?.response?.data?.message ||
+          error.message ||
+          "Something went wrong",
+      );
+    }
   };
 
   return (
