@@ -42,9 +42,9 @@ const Generator = () => {
 
   const handleGenerate = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    if (!user) return toast.error("Pleaser login yto generate.");
+    if (!user) return toast.error("Please login to generate.");
     if (!productImage || !modelImage || !name || !productName || !aspectRatio) {
-      return toast.error("Please fill all th reuired fields");
+      return toast.error("Please fill all the required fields");
     }
 
     try {
@@ -57,15 +57,13 @@ const Generator = () => {
       formData.append("userPrompt", userPrompt);
 
       const token = await getToken();
-      const { data } = await api.post("/api/project/generate", formData, {
+      const { data } = await api.post("/api/project/create", formData, {
         headers: {
-          "Content-Type": "multipart/form-data",
           Authorization: `Bearer ${token}`,
         },
       });
-
-      toast.success(data.message || "Generation started successfully!");
       navigate(`/result/${data.projectId}`);
+      toast.success(data.message || "Generation started successfully!");
     } catch (error: any) {
       setIsGenerating(false);
       toast.error(
