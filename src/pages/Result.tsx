@@ -16,8 +16,8 @@ import toast from "react-hot-toast";
 
 const Result = () => {
   const { projectId } = useParams();
-  const {getToken} = useAuth();
-  const {user, isLoaded} = useAuth();
+  const { getToken } = useAuth();
+  const { user, isLoaded } = useAuth();
   const navigate = useNavigate();
 
   const [project, setProject] = useState<Project>({} as Project);
@@ -27,7 +27,7 @@ const Result = () => {
   const fetchProjectData = async () => {
     try {
       const token = await getToken();
-      const {data} = await api.get(`/api/user/project/${projectId}`, {
+      const { data } = await api.get(`/api/user/project/${projectId}`, {
         headers: {
           Authorization: `Bearer ${token}`,
         },
@@ -42,13 +42,52 @@ const Result = () => {
     }
   };
 
-  const handleGenerateVideo = () => {
+  const handleGenerateVideo = async () => {
     setIsgenerating(true);
+    try {
+      const token = await getToken();
+      const { data } = await api.post(
+        "/api/project/video",
+        { projectId },
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        },
+      );
+      setProject((prevData) => ({
+        ...prevData,
+        generatedVideo: data.videUrl,
+        isGenerating: false,
+      }));
+
+      toast.success(data.message);
+      setIsgenerating(false);
+    } catch (error: any) {
+      toast.error(error?.response?.data?.message || error.message);
+      console.log(error);
+    }
   };
 
   useEffect(() => {
-    fetchProjectData();
-  }, []);
+    if (user && !project.id) {
+      fetchProjectData();
+    } else if (isLoaded && !user) {
+      navigate("/");
+    }
+  }, [user]);
+
+  // fetch project every 10 seconds
+  useEffect(() => {
+    if (user && isGenerating) {
+      const interval = setInterval(() => {
+        fetchProjectData();
+      }, 10000);
+
+      return () => clearInterval(interval);
+    }
+  }, [user, isGenerating]); 
+
   return isLoading ? (
     <div className="h-screen w-full flex items-center justify-center ">
       <Loader2Icon className="animate-spin size-7 text-indigo-400" />
